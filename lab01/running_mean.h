@@ -1,4 +1,4 @@
-#ifnde MEAN_H
+#ifndef MEAN_H
 #define MEAN_H
 
 struct data init_running_mean();
