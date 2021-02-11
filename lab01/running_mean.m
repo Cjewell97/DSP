@@ -6,8 +6,8 @@ mean = calc_running_mean(mean, data);
 disp(mean.mean);
 
 function mean = calc_running_mean(mean, data);
-    for(i=1:mean.size)
-        mean.data(i) = data(i)/mean.blocksize;
+    for(i=1:mean.blocksize)
+        mean.data(i) = data(i)/mean.size;
         mean.mean(i) = mean.mean(mod(i+mean.size - 1, mean.size) + 1) - mean.data(mod(mean.rear - 1+mean.size, mean.size) + 1) + mean.data(i);
         mean.rear = mod((mean.rear + 1), mean.size);
         %disp(mean.mean(i));

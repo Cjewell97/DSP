@@ -10,6 +10,6 @@ $(TARGET): $(OBJS)
 	     $(CC) -o $(TARGET) $(OBJS) $(LIBS)
 
 clean: 
-	rm -f $(TARGET) $(OBS) core*
+	rm -f $(TARGET) $(OBJS) core*
 
 running_mean.o main.o: running_mean.h
