@@ -53,9 +53,8 @@ int main(void)
   /*
    * Using the windowSize and default blocksize constrained in the lab
    */
-  int windowSize = 40;
 
-  struct data s = init_running_mean(windowSize, nsamp);
+  struct data s = init_running_mean(40, nsamp);
 	
   input = (float *)malloc(sizeof(float)*nsamp);
   output1 = (float *)malloc(sizeof(float)*nsamp);
@@ -74,7 +73,6 @@ int main(void)
    * To see the printf output, connect to the ST-Link serial port.
    * Use: 115200 8N1
    */
-  printf("Starting execution using %d samples per input block.\n",nsamp);
   
   /*
    * Infinite Loop to process the data stream, "nsamp" samples at a time
@@ -94,7 +92,10 @@ int main(void)
     
     DIGITAL_IO_SET(); 	// Use a scope on PD0 to measure execution time
     for (i=0; i<nsamp; i++) {
-      output1[i] = sign * input[i];
+      if (sign == -1.0){
+	input[i] = sign * input[i];
+      }
+      output1[i] = input[i];
       output2[i] = input[i]*input[i];
     }  
     DIGITAL_IO_RESET();	// (falling edge....  done processing data )
@@ -105,13 +106,14 @@ int main(void)
      * pass the processed working buffer back for DAC output
      */
     putblock(s.mean);
+    //putblockstereo(output1, output2);
     
     if (KeyPressed) {
       KeyPressed = RESET;
       sign *= -1.0;		// Invert output1
       
-      /*
-       * On each press, modify the LCD display, and toggle an LED
+      
+       /* On each press, modify the LCD display, and toggle an LED
        * (LED4=red, LED5=green) (Red is used to show error conditions)
        * 
        * Don't be surprised when these cause a Sample Overrun error, 
@@ -122,5 +124,6 @@ int main(void)
       BSP_LCD_GLASS_DisplayString( (uint8_t *)lcd_str);
       BSP_LED_Toggle(LED5);
     }
+  	
   }
 }
