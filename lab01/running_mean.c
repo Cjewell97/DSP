@@ -38,8 +38,6 @@ Subtract the last data point that is not being used in the mean anymore.
 
 // increment the front of the queue
 		mean.front = (mean.front + 1 + mean.size )%mean.size;
-		printf("%.5f\n", mean.mean[i]);
 	}
-	printf("\n");
 	return mean;
 }
