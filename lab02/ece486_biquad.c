@@ -30,6 +30,8 @@ void calc_biquad(BIQUAD_T *s, float *x, float *y){
 			s->v1 = s->v2 - s->coef[5*sec + 3] * y[n] + s->coef[5*sec + 1] * x[n];
 			// v2[n] = b2 * x[n] - a2 * y[n]
 			s->v2 = s->coef[5*sec + 2] - s->coef[5*sec + 4] * y[n];
+
+			x[n] = y[n];
 		}
 	}
 }
