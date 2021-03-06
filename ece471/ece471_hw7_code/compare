@@ -1,7 +1,0 @@
-#!/bin/bash
-
-while true
-do 
-	./readmcp3008 2
-	sleep 1
-done
