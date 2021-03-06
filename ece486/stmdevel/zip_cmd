@@ -1,0 +1,15 @@
+zip stmdevel -x \*.chm -r examples/toggle \
+		examples/ece486_example_L476 \
+                zip_cmd \
+                build/include \
+                build/lib \
+                build/src \
+                build/Makefile build/Makefile.inc build/README \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/BSP/STM32L476G-Discovery \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/BSP/Components \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/STM32L4xx_HAL_Driver \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/CMSIS/Device \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/CMSIS/DSP_Lib \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Drivers/CMSIS/Include \
+                build/STM32cubeL4/STM32Cube_FW_L4_V1.10.0/Projects/STM32L476G-Discovery
+                

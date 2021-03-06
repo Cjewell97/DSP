@@ -1,0 +1,39 @@
+STM32F476G_DiscoveryBoard Specific files.  
+
+Files are taken from the STM32cubel4 directory structure, and slightly modified 
+to support a re-located compile.  Typical changes include:
+
+  1)  Replacing "\" characters in include paths to "/"
+      (Did NOT find any of these in the latest stmcubel4 -DMH)
+  2)  Removing relative directory paths in include statements that 
+      depend upon the STM32cubef4 directory structure:  Change things
+      like 
+          #include "..\..\..\Components\Include\stuff.h"
+      to 
+          #include "stuff.h"
+
+Original files are copied from the following places: 
+      .../Drivers/BSP/STM32L476G-Discovery
+      .../Drivers/BSP/Components/cs43l22/
+      .../Drivers/BSP/Components/lsm303c/
+      .../Drivers/BSP/Components/l3gd20/
+      .../Drivers/BSP/Components/mfxstm32l152/m
+      .../Drivers/BSP/Components/n25q128a/     
+      
+      
+(Not all files are modified: The following grep output shows files that needed changes:)
+
+cs43l22.h:#include "../Common/audio.h"
+l3gd20.h:#include "../Common/gyro.h"
+lms303c.h:#include "../Common/accelero.h"
+lms303c.h:#include "../Common/magneto.h"
+mfxstm32l152.h:#include "../Common/ts.h"
+mfxstm32l152.h:#include "../Common/io.h"
+mfxstm32l152.h:#include "../Common/idd.h"
+tm32l476g_discovery_audio.h:#include "../Components/cs43l22/cs43l22.h"
+stm32l476g_discovery_compass.c:#include "../Components/lsm303c/lsm303c.h"
+stm32l476g_discovery_gyroscope.h:#include "../Components/l3gd20/l3gd20.h"
+stm32l476g_discovery_idd.h:#include "../Components/mfxstm32l152/mfxstm32l152.h"
+stm32l476g_discovery_qspi.h:#include "../Components/n25q128a/n25q128a.h"
+
+The Linker Load script STM32L476xx_FLASH.ld is copied from $(STCUBEBASE)/Projects/STM32L476G-Discovery/Templates/TrueSTUDIO/STM32L476G-Discovery/STM32L476VG_FLASH.ld : The file was modified to force the stack pointer to be initialized on an 8-byte address (Required for printing floating point values...  floats are promoted to doubles in printf(), and double are not passed correctly on a non-aligned stack.
