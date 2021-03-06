@@ -57,5 +57,6 @@ void calc_fir(FIR_T *s, float *x, float *y){
 
 // function to free memory
 void destroy_fir(FIR_T *s){
+	free(s->old);	
 	free(s);
 };
