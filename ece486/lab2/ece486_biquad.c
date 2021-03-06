@@ -38,7 +38,7 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 
 	
 	// Now iterate through each section
-	for (section_iter = 0; section_iter < s->sections; section_iter += 6)
+	for (section_iter = 0; section_iter < s->sections; section_iter += 5)
 	{
 		for (n = 0; n < s->blocksize; n++)
 		{
@@ -63,13 +63,12 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 			 *	coefficients, then add the index of the desired coefficient
 			 */
 
-			a0 = s->coefficients[section_iter + 0];
-			a1 = s->coefficients[section_iter + 1];
-			a2 = s->coefficients[section_iter + 2];
+			a1 = s->coefficients[section_iter + 0];
+			a2 = s->coefficients[section_iter + 1];
 
-			b0 = s->coefficients[section_iter + 3];
-			b1 = s->coefficients[section_iter + 4];
-			b2 = s->coefficients[section_iter + 5];
+			b0 = s->coefficients[section_iter + 2];
+			b1 = s->coefficients[section_iter + 3];
+			b2 = s->coefficients[section_iter + 4];
 
 
 			/*	With the coefficients for current section laid out, 
@@ -77,11 +76,11 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 			 */
 			
 			// y[n] = v1[n-1] + b0x[n]
-			y[n] = s->v1[section_iter / 6] + b0 * x[n];
+			y[n] = s->v1[section_iter / 5] + b0 * x[n];
 
 			// Update our v1 and v2 coefficient arrays
-			s->v1[section_iter / 6] = s->v2[section_iter / 6] - a1 * y[n] + b1 * x[n];
-			s->v2[section_iter / 6] = b2 * x[n] - a2 * y[n];
+			s->v1[section_iter / 5] = s->v2[section_iter / 6] - a1 * y[n] + b1 * x[n];
+			s->v2[section_iter / 5] = b2 * x[n] - a2 * y[n];
 
 			// Now set current x[n] to y[n]
 			x[n] = y[n];
