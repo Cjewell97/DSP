@@ -45,7 +45,7 @@ void calc_fir(FIR_T *s, float *x, float *y){
 				y[i] += s->h[n] * s->old[(s->marker + i - n + s->n_coef)%s->n_coef];
 			}
 		}
-		printf("y[%d] = %.3f\n", i, y[i]);
+		//printf("y[%d] = %.3f\n", i, y[i]);
 	}
 	for(int n = 0; n < s->blocksize; n++){
 		//  set the old values of x[n]

@@ -1,6 +1,6 @@
 TARGET=lab2
 
-OBJS  = lab2.o ece486_fir.o
+OBJS  = lab2.o ece486_fir.o ece486_biquad.o
 
 INSTALLDIR = /usr/local/stmdev/
 

@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* define biquad struct
+	sections : number of biquad filters in series
+	g : gain of the cascaded biquad
+	blocksize : size of the input array
+	coef : array of biquad coefficients
+	v1 : intermediate signal
+	v2 : intermediate signal
+*/
 typedef struct biquad {
 	int sections;
 	float g;

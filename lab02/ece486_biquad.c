@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "ece486_biquad.h"
 
-BIQUAD_T* init_biquad(int sections, float g, float* prev_biquads, int blocksize){
+BIQUAD_T* init_biquad(int sections, float g, float* biquad_coeffs, int blocksize){
 	BIQUAD_T* s = (BIQUAD_T*)malloc(sizeof(BIQUAD_T));
 	
 	s->sections = sections;
 	s->g = g;
 	s->blocksize = blocksize;
-	s->coef = prev_biquads;	
+	s->coef = biquad_coeffs;	
 	s->v1 = 0;
 	s->v2 = 0;
 
