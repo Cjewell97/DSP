@@ -6,8 +6,6 @@
 
 int main()	
 {
-	printf("Hey!\n");
-
 	
 	int sections = 2;
 	float g = 1;
@@ -29,7 +27,6 @@ int main()
 		x[i] = 0.0;
 
 	}
-	printf("This works!\n");
 	BIQUAD_T *s = init_biquad(sections, g, biquad_coeffs, blocksize);
 	
 	calc_biquad(s, x, y);

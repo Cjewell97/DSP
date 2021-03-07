@@ -36,10 +36,20 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 	float b0, b1, b2;
 	float a0, a1, a2;
 
-	
+	printf("%f %f %f %f %f\n" ,s->coefficients[0], s->coefficients[1], s->coefficients[2], s->coefficients[3], s->coefficients[4]);	
 	// Now iterate through each section
-	for (section_iter = 0; section_iter < s->sections; section_iter += 5)
+	for (section_iter = 0; section_iter < s->sections; section_iter++)
 	{
+		printf("Section iter: %d\n", section_iter);
+
+		a1 = s->coefficients[section_iter * 5 + 3];
+		a2 = s->coefficients[section_iter * 5 + 4];
+
+		b0 = s->coefficients[section_iter * 5 + 0];
+		b1 = s->coefficients[section_iter * 5 + 1];
+		b2 = s->coefficients[section_iter * 5 + 2];
+
+
 		for (n = 0; n < s->blocksize; n++)
 		{
 
@@ -61,26 +71,27 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 			 *	[b0, b1, b2, a0, a1, a2]
 			 *	To get each coefficient, simply multiply section_iter by 5 to get current 
 			 *	coefficients, then add the index of the desired coefficient
-			 */
+			 *
+			printf("%d\n", (section_iter * 5 + 0));	
+			a1 = s->coefficients[section_iter * 5 + 0];
+			a2 = s->coefficients[section_iter * 5 + 1];
 
-			a1 = s->coefficients[section_iter + 0];
-			a2 = s->coefficients[section_iter + 1];
+			b0 = s->coefficients[section_iter * 5 + 2];
+			b1 = s->coefficients[section_iter * 5 + 3];
+			b2 = s->coefficients[section_iter * 5 + 4];
+			*/
 
-			b0 = s->coefficients[section_iter + 2];
-			b1 = s->coefficients[section_iter + 3];
-			b2 = s->coefficients[section_iter + 4];
-
-
+			printf("A1: %f --- A2: %f --- B0: %f --- B1: %f --- B2: %f\n", a1, a2, b0, b1, b2);
 			/*	With the coefficients for current section laid out, 
 			 *	begin calculating for x and y
 			 */
 			
 			// y[n] = v1[n-1] + b0x[n]
-			y[n] = s->v1[section_iter / 5] + b0 * x[n];
+			y[n] = s->v1[section_iter] + b0 * x[n];
 
 			// Update our v1 and v2 coefficient arrays
-			s->v1[section_iter / 5] = s->v2[section_iter / 6] - a1 * y[n] + b1 * x[n];
-			s->v2[section_iter / 5] = b2 * x[n] - a2 * y[n];
+			s->v1[section_iter] = s->v2[section_iter] - a1 * y[n] + b1 * x[n];
+			s->v2[section_iter] = b2 * x[n] - a2 * y[n];
 
 			// Now set current x[n] to y[n]
 			x[n] = y[n];
