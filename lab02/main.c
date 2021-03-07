@@ -22,7 +22,7 @@ int main(int argc, char **argv){
 	
 
 	printf("\n\n============== BIQUAD ===============\n\n");
-	float bq_coef[] = {1, 1.618, 1, -1.5371, 0.9025, 1, -0.618, 1, 0.0, -0.81};
+	float bq_coef[] = {1, 1.618,1, -1.5371, 0.9025, 1, -0.618, 1, 0.0, -0.81};
 	float x2[20];
 	x2[0] = 3;
 	x2[1] = 1.5;
@@ -33,9 +33,12 @@ int main(int argc, char **argv){
 	for (int i = 4; i < 20; i++){
 		x2[i] = 0.0;
 	}
-	BIQUAD_T *ss = init_biquad(2, 3, bq_coef, 20);
+	BIQUAD_T *ss = init_biquad(2, 1, bq_coef, 20);
 	
 	calc_biquad(ss, x2, y2);
-
+	
+	for(int i = 0; i<20; i++){
+		printf("y[%d] = %.3f\n", i,y2[i]);
+	}
 	destroy_biquad(ss);
 }
