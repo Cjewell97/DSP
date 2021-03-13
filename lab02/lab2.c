@@ -24,17 +24,24 @@ int main(void)
 {
   int nsamp;
   float *input, *output1, *output2;
-  static float sign=1.0;
   static int button_count = 0;
   
 	float bq_coef[] = {
 		1, 1.618,1, -1.5371, 0.9025,
 		1, -0.618, 1, 0.0, -0.81,
 		1, 1.618,1, -1.5371, 0.9025,
-		1, 1.618,1, -1.5371, 0.9025,
 		1, -0.618, 1, 0.0, -0.81,
+		1, 1.618,1, -1.5371, 0.9025,
 		1, -0.618, 1, 0.0, -0.81
 	};
+
+	float g = 1./6.6e04;
+
+	//float fir_coef[20];
+	//for(int i=0; i < 20; i++){
+	//	fir_coef[i] = 1/20;
+	//}
+
 
 	float fir_coef[] = {
 		1, .2, 1.2, -.3, .5,
@@ -61,7 +68,7 @@ int main(void)
    * on the development board.
    */
   // initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
-  initialize_ece486(FS_48K, MONO_IN, MONO_OUT, HSE_EXTERNAL_8MHz);
+  initialize_ece486(FS_48K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
   
   /*
    * Allocate Required Memory
@@ -91,7 +98,7 @@ int main(void)
   /*
    * Infinite Loop to process the data stream, "nsamp" samples at a time
    */
-	BIQUAD_T* biquad = init_biquad(6,1,bq_coef,nsamp);
+	BIQUAD_T* biquad = init_biquad(6,g,bq_coef,nsamp);
 	FIR_T* fir = init_fir(fir_coef,20,nsamp);
 
   while(1){
@@ -114,13 +121,12 @@ int main(void)
      * pass the processed working buffer back for DAC output
      */
 
-		calc_biquad(biquad,input, output2);
 		calc_fir(fir,input, output1);
+		calc_biquad(biquad,input, output2);
 		putblockstereo(output1,output2);
 
     if (KeyPressed) {
       KeyPressed = RESET;
-      sign *= -1.0;		// Invert output1
       
       /*
        * On each press, modify the LCD display, and toggle an LED
@@ -130,7 +136,8 @@ int main(void)
        * depending on your sample rate.
        */
       button_count++;
-      sprintf(lcd_str, "BTN %2d", button_count);
+			char names[4][6] = {"aidan ", "caleb ", "sam   ", "tyler "};
+      sprintf(lcd_str, "%s", names[button_count%4]);
       BSP_LCD_GLASS_DisplayString( (uint8_t *)lcd_str);
       BSP_LED_Toggle(LED5);
     }
