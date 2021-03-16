@@ -1,3 +1,5 @@
 *.o
 main
 *.bak
+*.bak
+*.old
