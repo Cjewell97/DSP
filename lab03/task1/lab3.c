@@ -26,24 +26,22 @@ int main(void)
 	float32_t *bState, *fState;
   static int button_count = 0;
   
-	float32_t bq_coef[10] = {
-		1, 1.618, 1, 1.5371, -0.9025,
-		1, -0.618, 1, 0.0, 0.81
-	};
-	int nstage = 1;
 
-	float g = .0139;
+	float g = .3572;
 
-	//float fir_coef[20];
-	//for(int i=0; i < 20; i++){
-	//	fir_coef[i] = 1/20;
-	//}
-	float32_t fir_coef[20] = {
-		1, .2, 1.2, -.3, .5,
-		1, .2, -1, 1.3, -.4,
-		.5, -.2, .5, 1.5, 1,
-		1, 1, -.7, 1.3, .9
+	float32_t bq_coef[] = {
+	0.138012, 0.223308, 0.138012, 0.200533, -0.640000, 
+	0.216850, -0.412474, 0.216850, 1.090975, -0.792100, 
+	1.213542, -1.963553, 1.213542, 1.085273, -0.810000, 
+	0.865143, 1.017037, 0.865143, -0.059052, -0.883600 
 	};
+
+	int nstage = 4;
+
+	float32_t fir_coef[20];
+	for(int i=0; i < 20; i++){
+		fir_coef[i] = 1./20;
+	}
 	int n_fir = 20;
 
 	char lcd_str[8];
@@ -64,7 +62,7 @@ int main(void)
    * on the development board.
    */
   // initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
-  initialize_ece486(FS_48K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
+  initialize_ece486(FS_48K, MONO_IN, MONO_OUT, HSE_EXTERNAL_8MHz);
 	printf("initialized");
   
   /*
@@ -76,7 +74,7 @@ int main(void)
   input = (float32_t *)malloc(sizeof(float32_t)*nsamp);
   output1 = (float32_t *)malloc(sizeof(float32_t)*nsamp);
   output2 = (float32_t *)malloc(sizeof(float32_t)*nsamp);
-	bState = (float32_t *)calloc(2 * nstage, sizeof(float32_t));
+	bState = (float32_t *)calloc(nstage, sizeof(float32_t));
 	fState = (float32_t *)calloc(n_fir + nsamp - 1, sizeof(float32_t));
   
   if (input==NULL || output1==NULL || output2==NULL) {
@@ -98,7 +96,7 @@ int main(void)
    * Infinite Loop to process the data stream, "nsamp" samples at a time
    */
 	arm_fir_instance_f32 F = {n_fir, fState, fir_coef};
-	arm_biquad_cascade_df2T_instance_f32 B = {nstage, bState, bq_coef};
+	arm_biquad_cascade_df2T_instance_f32 B = {nstage/2, bState, bq_coef};
 	
 
   while(1){
@@ -120,15 +118,12 @@ int main(void)
      * pass the processed working buffer back for DAC output
      */
 		
-		arm_fir_f32(&F,input, output1, nsamp);
+		//arm_fir_f32(&F,input, output1, nsamp);
 		arm_biquad_cascade_df2T_f32(&B, input, output2, nsamp);
   	
 
-		for(int i = 0; i<nsamp; i++){
-			output2[i] *= 2;
-		}
 
-		putblockstereo(output1,output2);
+		putblock(output2);
 
    // if (KeyPressed) {
    //   KeyPressed = RESET;

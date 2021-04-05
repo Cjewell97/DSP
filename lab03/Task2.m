@@ -12,21 +12,19 @@ z = exp(1i * w);
 % filter f below 0.1 and above 0.35
 
 poles = [
-    0.9 * exp(1i * 2 * pi * 0.147 * [-1, 1]),...
-    0.94 * exp(1i* 2 * pi * 0.255 * [-1,1]),...
-    0.8 * exp(1i*2*pi*0.23 * [-1,1]),...
-    0.89 * exp(1i*2*pi*0.145 * [-1,1])        
+    0.9 * exp(1i * 2 * pi * 0.147 * [-1 1]),...
+    0.94 * exp(1i* 2 * pi * 0.255 * [-1 1]),...
+    0.8 * exp(1i*2*pi*0.23 * [-1 1]),...
+    0.89 * exp(1i*2*pi*0.145 * [-1 1])        
 ];
 
 zeros = [
-        1 * exp(1i* 2 * pi * 0.1 * [-1,1]),...
-        1 * exp(1i* 2 * pi * 0.35 * [-1,1]),...
-        1 * exp(1i* 2 * pi * 0.4 * [-1,1]),...
-        1 * exp(1i* 2 * pi * 0.05 * [-1,1])
+        1 * exp(1i* 2 * pi * 0.1 * [-1 1]),...
+        1 * exp(1i* 2 * pi * 0.35 * [-1 1]),...
+        1 * exp(1i* 2 * pi * 0.4 * [-1 1]),...
+        1 * exp(1i* 2 * pi * 0.05 * [-1 1])
         
 ];
-
-
 
 zeros = zeros';
 poles = poles';
@@ -93,3 +91,18 @@ xlabel('Frequency (f)')
 ylabel('Gain (dB)')
 ylim([-60,inf])
 hold off;
+
+
+[sos,g] = zp2sos(zeros,poles,1/max(H_z),'up','inf');
+disp(g);
+fprintf("float bq_coef[] = {\n\t");
+for i=1:size(sos)
+    for j=1:6
+        if j~=4
+            fprintf("%f, ",sos(i,j))
+        end
+    end
+    fprintf("\n\t");
+end
+fprintf("};\n");
+    
