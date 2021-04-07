@@ -29,7 +29,7 @@ zeros = [
 zeros = zeros';
 poles = poles';
 % Plot the pole-zero diagram
-figure(1);
+figure(3);
 hold on;
 plot(z)
 plot(real(poles), imag(poles), 'x')
@@ -43,6 +43,7 @@ xlabel('Re(z)')
 ylabel('Im(z)')
 
 hold off;
+
 
 % Find the gain of the filter.
 
@@ -66,7 +67,7 @@ H_z_DC = (1 / max(H_z)) .* H_z;
 
 H_z_DB = 20 * log10(H_z_DC);
 
-figure(2);
+figure(4);
 hold on;
 
 % Constrained frequencies
@@ -84,15 +85,16 @@ patch([f_high .5 .5 f_high], [-60, -60, -50, -50], 0.8*[1, 1, 1]);
 patch([f_c1 .2 f_c2 f_c2 .2 f_c1], [-1, -6, -1, 1, -4, 1], 0.8 * [1, 1, 1]);
 % And plot the filter
 % disp(H_z_DB);
-plot(f, H_z_DB);
+plot(f, H_z_DB, 'LineWidth',2);
 % hold on;
 title('Gain vs Frequency');
 xlabel('Frequency (f)')
 ylabel('Gain (dB)')
 ylim([-60,inf])
 hold off;
+grid on;
 
-
+% calculate coefficients and generate C code
 [sos,g] = zp2sos(zeros,poles,1/max(H_z),'up','inf');
 disp(g);
 fprintf("float bq_coef[] = {\n\t");

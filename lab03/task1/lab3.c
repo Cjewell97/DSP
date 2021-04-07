@@ -1,13 +1,3 @@
-/*
- * Example program to illustrate the use of the ECE 486 interface.
- * 
- * An input waveform is copied to the output DAC.  The waveform is also
- * squared and streamed to the second DAC output.  Each
- * USER button press inverts the signal on the original DAC.
- * 
- * The use of printf(), the pushbutton, and the LCD is also illustrated.
- */
-
 #include "stm32l4xx_hal.h"
 #include "stm32l476g_discovery.h"
 
@@ -29,15 +19,19 @@ int main(void)
 
 	float g = .3572;
 
+	// biquad coefficients, a1 and a2 (last 2 on each line)
+	//	are negated for the CMSIS implementation
 	float32_t bq_coef[] = {
 	0.138012, 0.223308, 0.138012, 0.200533, -0.640000, 
 	0.216850, -0.412474, 0.216850, 1.090975, -0.792100, 
 	1.213542, -1.963553, 1.213542, 1.085273, -0.810000, 
 	0.865143, 1.017037, 0.865143, -0.059052, -0.883600 
 	};
-
+	
+	// number of first order stages
 	int nstage = 4;
 
+	// FIR coefficients, set to work as a running average filter
 	float32_t fir_coef[20];
 	for(int i=0; i < 20; i++){
 		fir_coef[i] = 1./20;
@@ -63,11 +57,10 @@ int main(void)
    */
   // initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
   initialize_ece486(FS_48K, MONO_IN, MONO_OUT, HSE_EXTERNAL_8MHz);
-	printf("initialized");
   
   /*
    * Allocate Required Memory
-   *i
+   *
    */
   nsamp = getblocksize();
 	
@@ -82,65 +75,28 @@ int main(void)
     while(1);
   }
   
-  /*
-   * Normally we avoid printf()... especially once we start actually 
-   * processing streaming samples.  This is here to illustrate the 
-   * use of printf for debugging programs.
-   * 
-   * To see the printf output, connect to the ST-Link serial port.
-   * Use: 115200 8N1
-   */
-  // printf("Starting execution using %d samples per input block.\n",nsamp);
-  
-  /*
-   * Infinite Loop to process the data stream, "nsamp" samples at a time
-   */
+	// Initialize fir and biquad filter structs.
+	// use the number of 2nd order stages for the biquad filter
 	arm_fir_instance_f32 F = {n_fir, fState, fir_coef};
 	arm_biquad_cascade_df2T_instance_f32 B = {nstage/2, bState, bq_coef};
 	
 
+  /*
+   * Infinite Loop to process the data stream, "nsamp" samples at a time
+   */
   while(1){
-    /*
-     * Ask for a block of ADC samples to be put into the working buffer
-     *   getblock() will wait here until the input buffer is filled...  On return
-     *   we work on the new data buffer... then return here to wait for 
-     *   the next block
-     */
     getblock(input);	
 
-    /*
-     * signal processing code to calculate the required output buffers
-     */
-    
     DIGITAL_IO_SET();	// Use a scope on PD0 to measure execution time
     DIGITAL_IO_RESET();	// (falling edge....  done processing data )
-    /*
-     * pass the processed working buffer back for DAC output
-     */
-		
-		//arm_fir_f32(&F,input, output1, nsamp);
+	
+
+		// Calculate the output blocks using the FIR and biquad structs	
+		arm_fir_f32(&F,input, output1, nsamp);
 		arm_biquad_cascade_df2T_f32(&B, input, output2, nsamp);
   	
-
-
+		// output block on board. Stereo output has some error with it so use MONO_OUT
 		putblock(output2);
-
-   // if (KeyPressed) {
-   //   KeyPressed = RESET;
-   //   
-   //   /*
-   //    * On each press, modify the LCD display, and toggle an LED
-   //    * (LED4=red, LED5=green) (Red is used to show error conditions)
-   //    * 
-   //    * Don't be surprised when these cause a Sample Overrun error, 
-   //    * depending on your sample rate.
-   //    */
-   //   button_count++;
-	 // 	char names[4][6] = {"aidan ", "caleb ", "sam   ", "tyler "};
-   //   sprintf(lcd_str, "%s", names[button_count%4]);
-   //   BSP_LCD_GLASS_DisplayString( (uint8_t *)lcd_str);
-   //   BSP_LED_Toggle(LED5);
-   // }
   }
 }
 
