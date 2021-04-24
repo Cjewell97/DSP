@@ -28,81 +28,81 @@ int main(void)
 
 	// Create ARM FIR filter instances
 	arm_fir_decimate_instance_f32 s;
-  arm_fir_decimate_instance_f32 s3;
+  	arm_fir_decimate_instance_f32 s3;
         
 	// Set the blocksize to 1280 > fftsize=1024
 	setblocksize(1280);
 
 	//initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
-  initialize_ece486(FS_32K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
+  	initialize_ece486(FS_32K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
 
-  nsamp = getblocksize(); // Keep track of blocksize
+  	nsamp = getblocksize(); // Keep track of blocksize
 	blockSize = nsamp;
   	
 	// Memory Allocation
-  input = (float *)malloc(sizeof(float)*nsamp);
-  output1 = (float *)malloc(sizeof(float)*nsamp);
-  output2 = (float *)malloc(sizeof(float)*nsamp);
+  	input = (float *)malloc(sizeof(float)*nsamp);
+  	output1 = (float *)malloc(sizeof(float)*nsamp);
+  	output2 = (float *)malloc(sizeof(float)*nsamp);
 
 	// Keep track of decimated samples
-  float32_t *decBlock1 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
-  float32_t *decBlock2 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
+  	float32_t *decBlock1 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
+  	float32_t *decBlock2 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
 	
 	// Keep track of FIR filter states between blocks
 	float32_t *pState = (float32_t *)calloc(numTaps+blockSize-1,sizeof(float32_t));
-  float32_t *pState2 = (float32_t *)calloc(numTaps+blockSize-1,sizeof(float32_t));
+  	float32_t *pState2 = (float32_t *)calloc(numTaps+blockSize-1,sizeof(float32_t));
 	
 	// Check for memory allocation errors
-  if (input==NULL||output1==NULL||output2==NULL) {
-    	flagerror(MEMORY_ALLOCATION_ERROR);
-    	while(1);
-  }
+  	if (input==NULL||output1==NULL||output2==NULL) {
+    		flagerror(MEMORY_ALLOCATION_ERROR);
+    		while(1);
+  	}
 	
-  // Set up NCO waveforms
-  NCO_T *s1 = init_nco(1000.0/32000, 0.0);
-  NCO_T *s2 = init_nco(1000.0/32000, 3*M_PI/2);
+  	// Set up NCO waveforms
+  	NCO_T *s1 = init_nco(1000.0/32000, 0.0);
+  	NCO_T *s2 = init_nco(1000.0/32000, 3*M_PI/2);
   	
 	// Set the NCO amplitude to ensure DAC doesn't overflow
 	s1->amp = 0.9;
-  s2->amp = 0.9;
+  	s2->amp = 0.9;
 
-  // Coefficients for FIR lowpass decimation filter
-  float32_t pCoeffs[] = {
+  	// Coefficients for FIR lowpass decimation filter
+  	float32_t pCoeffs[] = {
 		0.000894733, 0.0010742, 0.00159809, 0.0021691, 0.00272184,
-    0.0031718, 0.00342232, 0.00336847, 0.00291526, 0.00198869,
-	  0.000552561, -0.00137972, -0.00373259, -0.00636332, -0.00906144,
-	  -0.0115575, -0.0135376, -0.0146663, -0.0146133, -0.0130853,
-	  -0.00985679, -0.00480003, 0.00209268, 0.0106942, 0.0207392,
-	  0.0318318, 0.0434665, 0.0550586, 0.0659845, 0.0756268,
-	  0.0834209, 0.0888985, 0.0917246, 0.0917246, 0.0888985,
-	  0.0834209, 0.0756268, 0.0659845, 0.0550586, 0.0434665,
-	  0.0318318, 0.0207392, 0.0106942, 0.00209268, -0.00480003,
-	  -0.00985679, -0.0130853, -0.0146133, -0.0146663, -0.0135376,
-	  -0.0115575, -0.00906144, -0.00636332, -0.00373259, -0.00137972,
-	   0.000552561, 0.00198869, 0.00291526, 0.00336847, 0.00342232,
-	   0.0031718, 0.00272184, 0.0021691, 0.00159809, 0.0010742,
-	   0.000894733
+    		0.0031718, 0.00342232, 0.00336847, 0.00291526, 0.00198869,
+	  	0.000552561, -0.00137972, -0.00373259, -0.00636332, -0.00906144,
+	  	-0.0115575, -0.0135376, -0.0146663, -0.0146133, -0.0130853,
+	  	-0.00985679, -0.00480003, 0.00209268, 0.0106942, 0.0207392,
+	  	0.0318318, 0.0434665, 0.0550586, 0.0659845, 0.0756268,
+	  	0.0834209, 0.0888985, 0.0917246, 0.0917246, 0.0888985,
+	  	0.0834209, 0.0756268, 0.0659845, 0.0550586, 0.0434665,
+	  	0.0318318, 0.0207392, 0.0106942, 0.00209268, -0.00480003,
+	  	-0.00985679, -0.0130853, -0.0146133, -0.0146663, -0.0135376,
+	  	-0.0115575, -0.00906144, -0.00636332, -0.00373259, -0.00137972,
+	  	 0.000552561, 0.00198869, 0.00291526, 0.00336847, 0.00342232,
+	  	 0.0031718, 0.00272184, 0.0021691, 0.00159809, 0.0010742,
+		 0.000894733
 	 };
 
   	// Initialization for CMSIS DSP ARM FIR Decimation filter	
-  arm_fir_decimate_init_f32(&s, numTaps, M, pCoeffs, pState, blockSize);
-  arm_fir_decimate_init_f32(&s3, numTaps, M, pCoeffs, pState2, blockSize);
+  	arm_fir_decimate_init_f32(&s, numTaps, M, pCoeffs, pState, blockSize);
+  	arm_fir_decimate_init_f32(&s3, numTaps, M, pCoeffs, pState2, blockSize);
 
-  // Set size for ARM FFT
-  uint32_t fftSize = 1024;
+  	// Set size for ARM FFT
+  	uint32_t fftSize = 1024;
     
-  // Allocate FFT arrays
-  float32_t *fft_array = (float32_t *)malloc(2*fftSize*sizeof(float32_t));
-  float32_t *fft_output = (float32_t *)malloc(fftSize*sizeof(float32_t));
+  	// Allocate FFT arrays
+  	float32_t *fft_array = (float32_t *)malloc(2*fftSize*sizeof(float32_t));
+  	float32_t *fft_output = (float32_t *)malloc(fftSize*sizeof(float32_t));
   
-  // Check for allocation errors
-  if (fft_array == NULL || fft_output == NULL) {
-	    flagerror(MEMORY_ALLOCATION_ERROR);
-	    while(1);
-  } 
+  	// Check for allocation errors
+  	if (fft_array == NULL || fft_output == NULL) {
+	    	flagerror(MEMORY_ALLOCATION_ERROR);
+	    	while(1);
+  	} 
 
-  // List of window coefficients
-  float32_t win[] = {
+  	// List of window coefficients
+  	float32_t win[] = {
     
 		0.438676, 0.440048, 0.44142, 0.442792, 0.444164,
 		0.445536, 0.446908, 0.448279, 0.449651, 0.451023,
@@ -363,8 +363,8 @@ int main(void)
 	};
 
 	// Windowing scale factor
-  float W0 = 1017.9;
-    /*
+  	float W0 = 1017.9;
+    	/*
    	* Normally we avoid printf()... especially once we start actually
    	* processing streaming samples.  This is here to illustrate the
    	* use of printf for debugging programs.
@@ -372,134 +372,135 @@ int main(void)
    	* To see the printf output, connect to the ST-Link serial port.
    	* Use: 115200 8N1
    	*/
-  printf("Starting execution using %d samples per input block.\n",nsamp);
+  	printf("Starting execution using %d samples per input block.\n",nsamp);
   	
 	/*
    	* Infinite Loop to process the data stream, "nsamp" samples at a time
    	*/
-  while(1){
+  	while(1){
     		/*
      		* Ask for a block of ADC samples to be put into the working buffer
      		*   getblock() will wait here until the input buffer is filled...  On return
      		*   we work on the new data buffer... then return here to wait for
      		*   the next block
      		*/
-    	getblock(input);
+    		getblock(input);
 
-	    counter++; // Keep track of current block number
+	    	counter++; // Keep track of current block number
     		
 		/*
      		* signal processing code to calculate the required output buffers
      		*/
 
-      DIGITAL_IO_SET();  // Use a scope on PD0 to measure execution time
+      		DIGITAL_IO_SET();  // Use a scope on PD0 to measure execution time
 
-    	// Generate NCO with proper center frequency from button
-		  nco_set_frequency(s1, f0/32000.0);
-		  nco_set_frequency(s2, f0/32000.0);
+    		// Generate NCO with proper center frequency from button
+		nco_set_frequency(s1, f0/32000.0);
+		nco_set_frequency(s2, f0/32000.0);
 
-		  // Code to calculate NCO waveform samples (+-exp(2*pi*f0))
-		  nco_get_samples(s1, output1, nsamp);
-		  nco_get_samples(s2, output2, nsamp);
+		// Code to calculate NCO waveform samples (+-exp(2*pi*f0))
+		nco_get_samples(s1, output1, nsamp);
+		nco_get_samples(s2, output2, nsamp);
 
-		  // Multiply input by 2 NCO waveforms (MIXER)
-		  for (i = 0; i < nsamp; i++) {
-			     output1[i] = input[i] * output1[i];
-			     output2[i] = -input[i] * output2[i];
-		  }
+		// Multiply input by 2 NCO waveforms (MIXER)
+		for (i = 0; i < nsamp; i++) {
+			   output1[i] = input[i] * output1[i];
+			   output2[i] = -input[i] * output2[i];
+		}
 
-		    // Send input through FIR Decimation filter
-		    arm_fir_decimate_f32(&s, output1, decBlock1, blockSize);
-		    arm_fir_decimate_f32(&s3, output2, decBlock2, blockSize);
+		// Send input through FIR Decimation filter
+		arm_fir_decimate_f32(&s, output1, decBlock1, blockSize);
+		arm_fir_decimate_f32(&s3, output2, decBlock2, blockSize);
 
-		    // Put alternating samples from filter output real,imag into fft array
-		    for (i = 0; i < nsamp/M ; i++) { // decBlock len = nsamp/M
-			     fft_array[(counter-1)*2*nsamp/M+(i*2)] = decBlock1[i]*win[(counter-1)*nsamp/M+i];
-			     fft_array[(counter-1)*2*nsamp/M+(i*2)+1] = decBlock2[i]*win[(counter-1)*nsamp/M+i];
-		    }
+		// Put alternating samples from filter output real,imag into fft array
+		for (i = 0; i < nsamp/M ; i++) { // decBlock len = nsamp/M
+			 fft_array[(counter-1)*2*nsamp/M+(i*2)] = decBlock1[i]*win[(counter-1)*nsamp/M+i];
+			 fft_array[(counter-1)*2*nsamp/M+(i*2)+1] = decBlock2[i]*win[(counter-1)*nsamp/M+i];
+		}
 
-		    // Once 1024 decimated samples are collected then do FFT
-		    if (counter > 7) {
-			       // CALCULATE FFT IN HERE
+		// Once 1024 decimated samples are collected then do FFT
+		if (counter > 7) {
+			   // CALCULATE FFT IN HERE
 		    	   arm_cfft_f32( &arm_cfft_sR_f32_len1024, fft_array, 0, 1); // Calculate FFT
 		    	   arm_cmplx_mag_f32(fft_array, fft_output, fftSize); // Get magnitude of vectors
 		    	   arm_scale_f32(fft_output, 4/(W0), fft_output, fftSize); // Scale for output to DAC
 			
-			       counter = 0; // Reset block counter
-		    }
-
-		    // Put FFT results to output
-		    for (i = 0; i < nsamp ; i++) {
-			
-			  if ((i > (fftSize-192)) || (i < 192)) {
-				    // Mask out frequencies out of range
-				    output2[i] = -1.0;
-
-			  } 
-        else if (i < 512) {
-				  // Show -1kHz -> 0
-				  output2[i] = fft_output[1023-(511-i)]-1.0;
-
-			  } 
-        else if (i >= 512) {
-				      // Show 0 -> +1kHz
-				      output2[i] = fft_output[i-512]-1.0;
-
-			  }
-			
-			  // Generate triangle wave for reference
-			  if (i < 192) {
-				    // Mask out frequencies out of range
-				    output1[i] = -1.0;
-
-			  }
-        else if (i > (fftSize-192)) {
-				      // Mask out frequencies out of range
-				      output1[i] = -1.0;
-
-			  } 
-        else {
-				    // Line equation using magnitude of frequency step
-				    output1[i] = (i*(2.0/fftSize)-1.0);  
-			  }
-
+			   counter = 0; // Reset block counter
 		}
 
+		// Put FFT results to output
+		for (i = 0; i < nsamp ; i++) {
+			
+			if ((i > (fftSize-192)) || (i < 192)) {
+				// Mask out frequencies out of range
+				output2[i] = -1.0;
 
-    DIGITAL_IO_RESET();	// (falling edge....  done processing data )
+		} 
+        	else if (i < 512) {
+			// Show -1kHz -> 0
+			output2[i] = fft_output[1023-(511-i)]-1.0;
 
-    		/*
-     		* pass the processed working buffer back for DAC output
-     		*/
-    putblockstereo(output1, output2);
+		} 
+        	else if (i >= 512) {
+			// Show 0 -> +1kHz
+			output2[i] = fft_output[i-512]-1.0;
+
+		}
+			
+		// Generate triangle wave for reference
+		if (i < 192) {
+			// Mask out frequencies out of range
+			output1[i] = -1.0;
+
+		}
+        
+		else if (i > (fftSize-192)) {
+			// Mask out frequencies out of range
+			output1[i] = -1.0;
+
+		} 
+        	else {
+			// Line equation using magnitude of frequency step
+			output1[i] = (i*(2.0/fftSize)-1.0);  
+		}
+
+	}
+
+
+    	DIGITAL_IO_RESET();	// (falling edge....  done processing data )
+
+    	/*
+     	* pass the processed working buffer back for DAC output
+     	*/
+    	putblockstereo(output1, output2);
     		
-		// Cycle through center frequency of mixer, f0, by pushing the button
-    if (KeyPressed) 
-		{
-			    KeyPressed = RESET;
-			    button_count++;
-    }
-			// If f0 greater than 15kHz then reset to DC
-		if (button_count > 15) {
-			button_count = 0;
-		}
+	// Cycle through center frequency of mixer, f0, by pushing the button
+    	if (KeyPressed) 
+	{
+		KeyPressed = RESET;
+		button_count++;
+    	}
+	// If f0 greater than 15kHz then reset to DC
+	if (button_count > 15) {
+		button_count = 0;
+	}
 
-		// Calculate frequency using button count
-		f0=button_count*1000;
+	// Calculate frequency using button count
+	f0=button_count*1000;
 
-		// String to display to LCD
+	// String to display to LCD
   	char dispString[8];
 
-		// Format the display string with center frequency for output
+	// Format the display string with center frequency for output
   	sprintf(dispString,"%d",f0);
 
-		// Clear the display
+	// Clear the display
   	BSP_LCD_GLASS_DisplayString((uint8_t *)"        ");
 
-		// Display the center frequency
-		BSP_LCD_GLASS_DisplayString((uint8_t *)dispString);
+	// Display the center frequency
+	BSP_LCD_GLASS_DisplayString((uint8_t *)dispString);
 
 
-		}
-  }
+	}
+    }
 }
