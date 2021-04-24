@@ -1,6 +1,6 @@
-TARGET=labfiveFreq_analyzer
+TARGET=lab4
 
-OBJS  = labfiveFreq_analyzer.o ece486_nco.o
+OBJS  = lab4.o ece486_nco.o
 
 INSTALLDIR = /usr/local/stmdev/
 
