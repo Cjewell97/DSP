@@ -50,8 +50,8 @@ int main(void)
   	output2 = (float *)malloc(sizeof(float)*nsamp);
 
 	// Keep track of decimated samples
-  	float32_t *decBlock1 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
-  	float32_t *decBlock2 = (float32_t *)calloc(nsamp/10, sizeof(float32_t));
+  	float32_t *decBlock1 = (float32_t *)calloc(nsamp/M, sizeof(float32_t));
+  	float32_t *decBlock2 = (float32_t *)calloc(nsamp/M, sizeof(float32_t));
 	
 	// Keep track of FIR filter states between blocks
 	float32_t *pState = (float32_t *)calloc(numTaps+blockSize-1,sizeof(float32_t));
