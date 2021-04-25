@@ -434,15 +434,15 @@ int main(void)
 
       		DIGITAL_IO_SET();  // Use a scope on PD0 to measure execution time
 
-    		// Generate NCO with proper center frequency from button
-		nco_set_frequency(s1, f0/SAMPLING_FREQUENCY);
-		nco_set_frequency(s2, f0/SAMPLING_FREQUENCY);
+    		// Set the current center frequency for spectrum analysis
+		nco_set_frequency(s1, F_0/SAMPLING_FREQUENCY);
+		nco_set_frequency(s2, F_0/SAMPLING_FREQUENCY);
 
-		// Code to calculate NCO waveform samples (+-exp(2*pi*f0))
+		// Now analyze that center frequency range
 		nco_get_samples(s1, output1, nsamp);
 		nco_get_samples(s2, output2, nsamp);
 
-		// Multiply input by 2 NCO waveforms (MIXER)
+		// Invert output2 to generate other side of spectrum (Negative frequencies)
 		for (i = 0; i < nsamp; i++) {
 			   output1[i] = input[i] * output1[i];
 			   output2[i] = -input[i] * output2[i];
