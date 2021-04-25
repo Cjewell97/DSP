@@ -369,19 +369,10 @@ int main(void)
 
 	// Windowing scale factor
   	float W0 = 1017.9;
-    	/*
-   	* Normally we avoid printf()... especially once we start actually
-   	* processing streaming samples.  This is here to illustrate the
-   	* use of printf for debugging programs.
-   	*
-   	* To see the printf output, connect to the ST-Link serial port.
-   	* Use: 115200 8N1
-   	*/
+
   	printf("Starting execution using %d samples per input block.\n",nsamp);
   	
-	/*
-   	* Infinite Loop to process the data stream, "nsamp" samples at a time
-   	*/
+
   	while(1){
     		/*
      		* Ask for a block of ADC samples to be put into the working buffer
@@ -400,8 +391,8 @@ int main(void)
       		DIGITAL_IO_SET();  // Use a scope on PD0 to measure execution time
 
     		// Generate NCO with proper center frequency from button
-		nco_set_frequency(s1, f0/32000.0);
-		nco_set_frequency(s2, f0/32000.0);
+		nco_set_frequency(s1, f0/SAMPLING_FREQUENCY);
+		nco_set_frequency(s2, f0/SAMPLING_FREQUENCY);
 
 		// Code to calculate NCO waveform samples (+-exp(2*pi*f0))
 		nco_get_samples(s1, output1, nsamp);
@@ -478,6 +469,9 @@ int main(void)
      	* pass the processed working buffer back for DAC output
      	*/
     	putblockstereo(output1, output2);
+		
+		
+	/* Set current frequency center, and display it (Takes care of question 3) */
     		
 	// Cycle through center frequency of mixer, f0, by pushing the button
     	if (KeyPressed) 
