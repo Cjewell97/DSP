@@ -14,6 +14,8 @@
 extern FlagStatus KeyPressed;
 
 #define DISPLAY_CLEAR	(unit8_t) "        "
+#define SAMPLING_FREQUENCY	32000.00000
+#define ONE_KHZ	1000.0
 
 int main(void)
 {
@@ -38,7 +40,8 @@ int main(void)
 	// Initialize the board
   	initialize_ece486(FS_32K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
 
-  	nsamp = getblocksize(); // Keep track of blocksize
+	// Keep track of blocksize
+  	nsamp = getblocksize(); 
 	blockSize = nsamp;
   	
 	// Memory Allocation
@@ -61,14 +64,14 @@ int main(void)
   	}
 	
   	// Set up NCO waveforms
-  	NCO_T *s1 = init_nco(1000.0/32000, 0.0);
-  	NCO_T *s2 = init_nco(1000.0/32000, 3*M_PI/2);
+  	NCO_T *s1 = init_nco((ONE_KHZ)/(SAMPLING_FREQUENCY), 0.0);
+  	NCO_T *s2 = init_nco((ONE_KHZ)/(SAMPLING_FREQUENCY), 3*M_PI/2);
   	
-	// Set the NCO amplitude to ensure DAC doesn't overflow
+	// Change the power to prevent the DAC from blowing up
 	s1->amp = 0.9;
   	s2->amp = 0.9;
 
-  	// Coefficients for FIR lowpass decimation filter
+  	// Coefficients for FIR lowpass decimation filter found from MATLAB
   	float32_t pCoeffs[] = {
 		0.000894733, 0.0010742, 0.00159809, 0.0021691, 0.00272184,
     		0.0031718, 0.00342232, 0.00336847, 0.00291526, 0.00198869,
