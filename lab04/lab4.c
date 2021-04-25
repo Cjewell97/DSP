@@ -29,6 +29,7 @@ int main(void)
 	uint16_t numTaps = 300; // Number of coefficients for FIR filter
 	uint8_t M = 10; // Decimation factor
 	uint32_t blockSize; // Size of input and output blocks
+  	uint32_t fftSize = 1024; // Set size for ARM FFT
 
 	// Create ARM FIR filter instances
 	arm_fir_decimate_instance_f32 s;
@@ -138,9 +139,6 @@ int main(void)
   	// Initialization for CMSIS DSP ARM FIR Decimation filter	
   	arm_fir_decimate_init_f32(&s, numTaps, M, pCoeffs, pState, blockSize);
   	arm_fir_decimate_init_f32(&s3, numTaps, M, pCoeffs, pState2, blockSize);
-
-  	// Set size for ARM FFT
-  	uint32_t fftSize = 1024;
     
   	// Allocate FFT arrays
   	float32_t *fft_array = (float32_t *)malloc(2*fftSize*sizeof(float32_t));
