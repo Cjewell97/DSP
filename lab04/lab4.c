@@ -72,7 +72,7 @@ int main(void)
 	s1->amp = 0.9;
   	s2->amp = 0.9;
 
-  	// Coefficients for FIR lowpass decimation filter found from MATLAB
+  	// Coefficients for FIR lowpass decimation filter found from MATLAB (FilterDesigner.m)
   	float32_t pCoeffs[] = {
 		1.49796e-10, -4.35172e-10, -1.60607e-09, -4.08764e-09, -8.52118e-09, 
 		-1.55834e-08, -2.58131e-08, -3.93781e-08, -5.57879e-08, -7.3586e-08, 
