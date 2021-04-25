@@ -25,7 +25,7 @@ int main(void)
 	float *input, *output1, *output2; // Arrays for input and output blocks
 	int counter = 0; // Track number of input blocks
 	int button_count = 0; // Track number of button presses
-  	int f0 = 0; // Center frequency for the mixer
+  	int F_0 = 0; // Center frequency for the mixer
 	uint16_t numTaps = 66; // Number of coefficients for FIR filter
 	uint8_t M = 10; // Decimation factor
 	uint32_t blockSize; // Size of input and output blocks
@@ -485,13 +485,13 @@ int main(void)
 	}
 
 	// Multiply button count by 1000 to get KHz stepped frequency center
-	f_0 = button_count*1000;
+	F_0 = button_count*1000;
 
-	// String to hold f_0
+	// String to hold F_0
   	char dispString[8];
 
 	// Display f_0
-  	sprintf(dispString,"%d",f_0);
+  	sprintf(dispString,"%d",F_0);
 
 	// Clear the display
   	BSP_LCD_GLASS_DisplayString(DISPLAY_CLEAR);
