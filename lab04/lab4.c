@@ -13,6 +13,8 @@
 // To detect a button press
 extern FlagStatus KeyPressed;
 
+#define DISPLAY_CLEAR	(unit8_t) "        "
+
 int main(void)
 {
 
@@ -30,10 +32,10 @@ int main(void)
 	arm_fir_decimate_instance_f32 s;
   	arm_fir_decimate_instance_f32 s3;
         
-	// Set the blocksize to 1280 > fftsize=1024
+	// Set the blocksize to 1280, will make the fftsize equal to 1024
 	setblocksize(1280);
 
-	//initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
+	// Initialize the board
   	initialize_ece486(FS_32K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
 
   	nsamp = getblocksize(); // Keep track of blocksize
@@ -480,22 +482,22 @@ int main(void)
 		KeyPressed = RESET;
 		button_count++;
     	}
-	// If f0 greater than 15kHz then reset to DC
+	// If button presses exceeds the upper center limit, restart back to 0 
 	if (button_count > 15) {
 		button_count = 0;
 	}
 
-	// Calculate frequency using button count
-	f0=button_count*1000;
+	// Multiply button count by 1000 to get KHz stepped frequency center
+	f_0 = button_count*1000;
 
-	// String to display to LCD
+	// String to hold f_0
   	char dispString[8];
 
-	// Format the display string with center frequency for output
-  	sprintf(dispString,"%d",f0);
+	// Display f_0
+  	sprintf(dispString,"%d",f_0);
 
 	// Clear the display
-  	BSP_LCD_GLASS_DisplayString((uint8_t *)"        ");
+  	BSP_LCD_GLASS_DisplayString(DISPLAY_CLEAR);
 
 	// Display the center frequency
 	BSP_LCD_GLASS_DisplayString((uint8_t *)dispString);
