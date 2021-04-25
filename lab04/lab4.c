@@ -453,13 +453,16 @@ int main(void)
 		arm_fir_decimate_f32(&s3, output2, decBlock2, blockSize);
 
 		// Put alternating samples from filter output real,imag into fft array
-		for (i = 0; i < nsamp/M ; i++) { // decBlock len = nsamp/M
+		for (i = 0; i < nsamp/M ; i++) 
+		{ 
+			 // decBlock len = nsamp/M
 			 fft_array[(counter-1)*2*nsamp/M+(i*2)] = decBlock1[i]*win[(counter-1)*nsamp/M+i];
 			 fft_array[(counter-1)*2*nsamp/M+(i*2)+1] = decBlock2[i]*win[(counter-1)*nsamp/M+i];
 		}
 
 		// Once 1024 decimated samples are collected then do FFT
-		if (counter > 7) {
+		if (counter > 7) 
+		{
 			   // CALCULATE FFT IN HERE
 		    	   arm_cfft_f32( &arm_cfft_sR_f32_len1024, fft_array, 0, 1); // Calculate FFT
 		    	   arm_cmplx_mag_f32(fft_array, fft_output, fftSize); // Get magnitude of vectors
@@ -469,37 +472,45 @@ int main(void)
 		}
 
 		// Put FFT results to output
-		for (i = 0; i < nsamp ; i++) {
+		for (i = 0; i < nsamp ; i++) 
+		{
 			
-			if ((i > (fftSize-192)) || (i < 192)) {
+			if ((i > (fftSize-192)) || (i < 192)) 
+			{
 				// Mask out frequencies out of range
 				output2[i] = -1.0;
+			}
 
 		} 
-        	else if (i < 512) {
+        	else if (i < 512) 
+		{
 			// Show -1kHz -> 0
 			output2[i] = fft_output[1023-(511-i)]-1.0;
 
 		} 
-        	else if (i >= 512) {
+        	else if (i >= 512) 
+		{
 			// Show 0 -> +1kHz
 			output2[i] = fft_output[i-512]-1.0;
 
 		}
 			
 		// Generate triangle wave for reference
-		if (i < 192) {
+		if (i < 192) 
+		{
 			// Mask out frequencies out of range
 			output1[i] = -1.0;
 
 		}
         
-		else if (i > (fftSize-192)) {
+		else if (i > (fftSize-192)) 
+		{
 			// Mask out frequencies out of range
 			output1[i] = -1.0;
 
 		} 
-        	else {
+        	else 
+		{
 			// Line equation using magnitude of frequency step
 			output1[i] = (i*(2.0/fftSize)-1.0);  
 		}
@@ -524,7 +535,8 @@ int main(void)
 		button_count++;
     	}
 	// If button presses exceeds the upper center limit, restart back to 0 
-	if (button_count > 15) {
+	if (button_count > 15) 
+	{
 		button_count = 0;
 	}
 
