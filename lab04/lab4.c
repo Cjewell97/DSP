@@ -26,7 +26,7 @@ int main(void)
 	int counter = 0; // Track number of input blocks
 	int button_count = 0; // Track number of button presses
   	int F_0 = 0; // Center frequency for the mixer
-	uint16_t numTaps = 66; // Number of coefficients for FIR filter
+	uint16_t numTaps = 300; // Number of coefficients for FIR filter
 	uint8_t M = 10; // Decimation factor
 	uint32_t blockSize; // Size of input and output blocks
 
