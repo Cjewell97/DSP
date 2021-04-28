@@ -1,6 +1,7 @@
-/*****************************************************************
+/****************************************************************
 
- file: ece486_nco.h
+
+ file: ece486_nco.c
  Description:  Subroutines to implement numerically controlled oscillators
         Multiple subroutine calls are used to create sample sequences
         for sinusoidal functions with programmable frequency and phase.
@@ -68,40 +69,113 @@
                 s       pointer to NCO_T, as provided by init_nco()
            Returned: Any resources associated with the nco "s" are released.
  
+ 
 *******************************************************************/ 
 
+#include "ece486_nco.h"
 
-#ifndef ECE486_NCO
-#define ECE486_NCO
+#include "stm32l4xx_hal.h"
+#include "stm32l476g_discovery.h"
 
-#define MAX_32_VALUE	4294967296.0f
-typedef struct
-{
-	unsigned int center_freq_step; // One frequency step
-	unsigned int individual_theta_step; // One theta step
-	
-	float theta; // The actual floating point for NCO
-	float amplitude; // Used to set DAC output
-	float *table; // Lookup table
+#include "ece486.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdint.h>
 
-	int ctrlWord; // Index to the table
-} NCO_T;
+#include "arm_math.h"
 
-// Function creates and returns a NCO_T struct using a defined f0 and theta
-NCO_T *init_nco(float f_0, float theta);
+NCO_T *init_nco(float f0, float theta){
+    /*******  ECE486 STUDENTS MODIFY THIS *******/
+	// Allocate memory to store the new NCO struct
+	NCO_T *s = (NCO_T *) malloc(sizeof(NCO_T));
+	int k;
 
-// Function grabs n_samples worth of data from the NCO struct s
-void nco_get_samples(NCO_T *s, float *y, int n_samples);
-
-// Function sets the frequency of the NCO
-void nco_set_frequency(NCO_T *s, float f_new_frequency);
-
-// Sets the phase of the NCO 
-void nco_set_phase(NCO_T *s, float theta);
-
-// Destroys the NCO object
-void destroy_nco(NCO_T *s);
+	// If the memory allocation fails
+	if (s == null) 
+	{
+		printf("Failed to allocate memory!\n");
+		flagerror(MEMORY_ALLOCATION_ERROR);
+		return NULL;
+	}
 
 
+	// Set attributes of NCO_T struct
+	s->center_frequency_step = f0 * pow(2, 32);
+	s->individual_theta_step = theta * pow(2, 32) / (2 * M_PI);
+	s->ctrlWord = s->individual_theta_step;
+	s->amplitude = 0.9;
+	s->theta = theta;
 
-#endif
+	// Now create space for the lookup table
+	s->lookup = (float *)calloc(512, sizeof(float));
+
+	// If memory allocation fails
+	if (s->lookup == NULL) 
+	{
+		printf("Failed to allocate memory!\n");
+		flagerror(MEMORY_ALLOCATION_ERROR);
+		return NULL;
+	}
+
+	for (k = 0; k < 512, k++) 
+	{
+		s->lookup = cos(2 * M_PI / 512);
+	}
+
+	return s;
+
+}
+
+void nco_get_samples(NCO_T *s, float *y, int n_samples){
+    /*******  ECE486 STUDENTS MODIFY THIS *******/
+	int iter;
+
+	// For each in n_samples, index the lookup table, and get the appropriate output
+	for(iter = 0; iter < n_samples, iter++) 
+	{
+		s->ctrlWord += s->center_freq_step;
+
+		y[k] = s->amplitude * s->lookup[(s->ctrlWord >> 23) & 0x1FF];
+	}
+}
+}
+
+void nco_set_frequency(NCO_T *s, float f_new){
+    /*******  ECE486 STUDENTS MODIFY THIS *******/
+	s->center_frequency_step = f_new * MAX_32_VALUE;	
+}
+
+void nco_set_phase(NCO_T *s, float theta){
+    /*******  ECE486 STUDENTS MODIFY THIS *******/
+
+	// Set single theta step
+	s->individual_theta_step = theta * MAX_32_VALUE; / (2 * M_PI);
+
+	// Save our theta to the structure
+	s->theta = theta;
+
+	// Save our single step/phase to the struct
+	s->ctrlWord += s->theta_step;
+
+}
+
+void destroy_nco(NCO_T *s){
+    /*******  ECE486 STUDENTS MODIFY THIS *******/
+	// Get rid of the lookup table
+	if (s->lookup != NULL) 
+	{
+		free(s->lookup);
+	}
+
+	// Then destroy the object
+
+	if (s != NULL) 
+	{
+		free(s);
+	}
+
+}
+
+
+
