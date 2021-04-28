@@ -35,7 +35,7 @@ void calc_biquad(BIQUAD_T *s, float * x, float * y)
 	
 	// Variables to hold current sections coefficients
 	float b0, b1, b2;
-	float a0, a1, a2;
+	float a1, a2;
 
 	//printf("%f %f %f %f %f\n" ,s->coefficients[0], s->coefficients[1], s->coefficients[2], s->coefficients[3], s->coefficients[4]);	
 	// Now iterate through each section

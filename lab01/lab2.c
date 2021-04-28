@@ -26,20 +26,29 @@ int main(void)
   float *input, *output1, *output2;
   static int button_count = 0;
   
-
-	float g = .3572;
-
-	static float bq_coef[] = {
-	0.138012, 0.223308, 0.138012, -0.200533, 0.640000, 
-	0.216850, -0.412474, 0.216850, -1.090975, 0.792100, 
-	1.213542, -1.963553, 1.213542, -1.085273, 0.810000, 
-	0.865143, 1.017037, 0.865143, 0.059052, 0.883600 
+	float bq_coef[] = {
+		1, 1.618,1, -1.5371, 0.9025,
+		1, -0.618, 1, 0.0, -0.81,
+		1, 1.618,1, -1.5371, 0.9025,
+		1, -0.618, 1, 0.0, -0.81,
+		1, 1.618,1, -1.5371, 0.9025,
+		1, -0.618, 1, 0.0, -0.81
 	};
 
-	static float fir_coef[20];
-	for(int i=0; i < 20; i++){
-		fir_coef[i] = 1./20;
-	}
+	float g = 1./6.6e04;
+
+	//float fir_coef[20];
+	//for(int i=0; i < 20; i++){
+	//	fir_coef[i] = 1/20;
+	//}
+
+
+	float fir_coef[] = {
+		1, .2, 1.2, -.3, .5,
+		1, .2, -1, 1.3, -.4,
+		.5, -.2, .5, 1.5, 1,
+		1, 1, -.7, 1.3, .9
+	};
 
 	char lcd_str[8];
 
@@ -59,7 +68,7 @@ int main(void)
    * on the development board.
    */
   // initialize_ece486(FS_50K, MONO_IN, STEREO_OUT, MSI_INTERNAL_RC);
-  initialize_ece486(FS_48K, MONO_IN, MONO_OUT, HSE_EXTERNAL_8MHz);
+  initialize_ece486(FS_48K, MONO_IN, STEREO_OUT, HSE_EXTERNAL_8MHz);
   
   /*
    * Allocate Required Memory
@@ -89,7 +98,7 @@ int main(void)
   /*
    * Infinite Loop to process the data stream, "nsamp" samples at a time
    */
-	BIQUAD_T* biquad = init_biquad(4,g,bq_coef,nsamp);
+	BIQUAD_T* biquad = init_biquad(6,g,bq_coef,nsamp);
 	FIR_T* fir = init_fir(fir_coef,20,nsamp);
 
   while(1){
@@ -106,15 +115,15 @@ int main(void)
      */
     
     DIGITAL_IO_SET();	// Use a scope on PD0 to measure execution time
-		calc_biquad(biquad,input, output2);
-
     DIGITAL_IO_RESET();	// (falling edge....  done processing data )
     
     /*
      * pass the processed working buffer back for DAC output
      */
+
 		calc_fir(fir,input, output1);
-		putblock(output1);
+		calc_biquad(biquad,input, output2);
+		putblockstereo(output1,output2);
 
     if (KeyPressed) {
       KeyPressed = RESET;

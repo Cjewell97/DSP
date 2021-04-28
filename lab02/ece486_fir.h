@@ -13,6 +13,7 @@ typedef struct your_fir_struct {
 	int n_coef;
 	int blocksize;
 	int marker;
+	float *y
 } FIR_T;
 
 FIR_T *init_fir(

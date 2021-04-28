@@ -15,21 +15,30 @@ fir_coef = [
 	];
 
 x = zeros(1000,1);
-
+sine = false;
 for i=1:1000
-    x(i) = .2*sin(i*pi/100);
+    if sine
+        x(i) = .2*sin(i*pi/100)+.2;
+    else
+        if mod(floor(i/100),2);
+            x(i) = .2;
+        end
+    end
 end
-output = sosfilt(bq_coef, x);
+
+bq_out = sosfilt(bq_coef, x);
 plot(x,'r','LineWidth',2)
 hold on
-g = 1/max(output)
-plot(g*output,'y','LineWidth',2)
+g = 1/max(bq_out)
+plot(g*bq_out,'Color','#ffa600','LineWidth',2)
 hold on
-output = conv(fir_coef,x);
-plot(output,'Color','#00AAE3','LineWidth',2)
+fir_out = conv(fir_coef,x);
+plot(fir_out,'Color','#00AAE3','LineWidth',2)
+xlim([0,length(fir_out)]);
 grid on
 lgnd = legend('input','biquad','fir');
+xlabel('n')
+ylabel('y[n]')
 set(lgnd, 'Color', 'w');
-set(gca, 'GridColor','w');
-set(gca, 'Color', 'k');
-xlim([0,length(fir_out)]);
+% set(gca, 'GridColor','w');
+% set(gca, 'Color', 'k');

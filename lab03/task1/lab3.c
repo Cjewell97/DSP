@@ -88,14 +88,15 @@ int main(void)
     getblock(input);	
 
     DIGITAL_IO_SET();	// Use a scope on PD0 to measure execution time
-    DIGITAL_IO_RESET();	// (falling edge....  done processing data )
-	
-
 		// Calculate the output blocks using the FIR and biquad structs	
 		arm_fir_f32(&F,input, output1, nsamp);
+    DIGITAL_IO_RESET();	// (falling edge....  done processing data )
+    
+		DIGITAL_IO_SET();	// Use a scope on PD0 to measure execution time
 		arm_biquad_cascade_df2T_f32(&B, input, output2, nsamp);
-  	
+    DIGITAL_IO_RESET();	// (falling edge....  done processing data )
 		// output block on board. Stereo output has some error with it so use MONO_OUT
+
 		putblock(output2);
   }
 }
