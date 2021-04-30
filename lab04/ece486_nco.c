@@ -92,7 +92,7 @@ NCO_T *init_nco(float f0, float theta){
 	int k;
 
 	// If the memory allocation fails
-	if (s == null) 
+	if (s == NULL) 
 	{
 		printf("Failed to allocate memory!\n");
 		flagerror(MEMORY_ALLOCATION_ERROR);
@@ -101,26 +101,26 @@ NCO_T *init_nco(float f0, float theta){
 
 
 	// Set attributes of NCO_T struct
-	s->center_frequency_step = f0 * pow(2, 32);
+	s->center_freq_step = f0 * pow(2, 32);
 	s->individual_theta_step = theta * pow(2, 32) / (2 * M_PI);
 	s->ctrlWord = s->individual_theta_step;
 	s->amplitude = 0.9;
 	s->theta = theta;
 
 	// Now create space for the lookup table
-	s->lookup = (float *)calloc(512, sizeof(float));
+	s->table = (float *)calloc(512, sizeof(float));
 
 	// If memory allocation fails
-	if (s->lookup == NULL) 
+	if (s->table == NULL) 
 	{
 		printf("Failed to allocate memory!\n");
 		flagerror(MEMORY_ALLOCATION_ERROR);
 		return NULL;
 	}
 
-	for (k = 0; k < 512, k++) 
+	for (k = 0; k < 512; k++) 
 	{
-		s->lookup = cos(2 * M_PI / 512);
+		s->table[k] = cos(2 * M_PI / 512);
 	}
 
 	return s;
@@ -132,40 +132,39 @@ void nco_get_samples(NCO_T *s, float *y, int n_samples){
 	int iter;
 
 	// For each in n_samples, index the lookup table, and get the appropriate output
-	for(iter = 0; iter < n_samples, iter++) 
+	for(iter = 0; iter < n_samples; iter++) 
 	{
 		s->ctrlWord += s->center_freq_step;
 
-		y[k] = s->amplitude * s->lookup[(s->ctrlWord >> 23) & 0x1FF];
+		y[iter] = s->amplitude * s->table[(s->ctrlWord >> 23) & 0x1FF];
 	}
-}
 }
 
 void nco_set_frequency(NCO_T *s, float f_new){
     /*******  ECE486 STUDENTS MODIFY THIS *******/
-	s->center_frequency_step = f_new * MAX_32_VALUE;	
+	s->center_freq_step = f_new * MAX_32_VALUE;	
 }
 
 void nco_set_phase(NCO_T *s, float theta){
     /*******  ECE486 STUDENTS MODIFY THIS *******/
 
 	// Set single theta step
-	s->individual_theta_step = theta * MAX_32_VALUE; / (2 * M_PI);
+	s->individual_theta_step = theta * MAX_32_VALUE / (2 * M_PI);
 
 	// Save our theta to the structure
 	s->theta = theta;
 
 	// Save our single step/phase to the struct
-	s->ctrlWord += s->theta_step;
+	s->ctrlWord += s->individual_theta_step;
 
 }
 
 void destroy_nco(NCO_T *s){
     /*******  ECE486 STUDENTS MODIFY THIS *******/
 	// Get rid of the lookup table
-	if (s->lookup != NULL) 
+	if (s->table != NULL) 
 	{
-		free(s->lookup);
+		free(s->table);
 	}
 
 	// Then destroy the object
@@ -176,6 +175,3 @@ void destroy_nco(NCO_T *s){
 	}
 
 }
-
-
-

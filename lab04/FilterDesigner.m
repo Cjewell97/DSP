@@ -7,7 +7,7 @@ N = 16*1024;
 % Sampling Frequency (32kHz)
 Fs = 32e3;
 
-beta = 7.7;
+beta = 9;
 
 % Set f and M
 f = (0:N-1)/N;

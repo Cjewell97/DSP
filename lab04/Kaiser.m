@@ -4,7 +4,7 @@
 M=1280;
 
 % Arbitrary beta
-beta = 2;
+beta = 9;
 
 % Generate the filter
 win = kaiser(M,beta)';

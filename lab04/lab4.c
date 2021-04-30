@@ -13,7 +13,7 @@
 // To detect a button press
 extern FlagStatus KeyPressed;
 
-#define DISPLAY_CLEAR	(unit8_t) "        "
+#define DISPLAY_CLEAR	(uint8_t) "        "
 #define SAMPLING_FREQUENCY	32000.00000
 #define ONE_KHZ	1000.0
 
@@ -69,8 +69,8 @@ int main(void)
   	NCO_T *s2 = init_nco((ONE_KHZ)/(SAMPLING_FREQUENCY), 3*M_PI/2);
   	
 	// Change the power to prevent the DAC from blowing up
-	s1->amp = 0.9;
-  	s2->amp = 0.9;
+	s1->amplitude = 0.9;
+  	s2->amplitude = 0.9;
 
   	// Coefficients for FIR lowpass decimation filter found from MATLAB (FilterDesigner.m)
   	float32_t pCoeffs[] = {
@@ -480,8 +480,7 @@ int main(void)
 				// Mask out frequencies out of range
 				output2[i] = -1.0;
 			}
-
-		} 
+ 
         	else if (i < 512) 
 		{
 			// Show -1kHz -> 0
@@ -557,5 +556,4 @@ int main(void)
 
 
 	}
-    }
 }
