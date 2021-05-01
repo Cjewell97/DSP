@@ -7,11 +7,11 @@ N = 16*1024;
 % Sampling Frequency (32kHz)
 Fs = 32e3;
 
-beta = 9;
+beta = 5.678;
 
 % Set f and M
 f = (0:N-1)/N;
-M = 300;
+M = 90;
 
 % Frequency points on Nyquist
 F = [0 0.03125 0.06875 0.5] / 0.5;
