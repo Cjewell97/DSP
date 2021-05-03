@@ -1,6 +1,6 @@
 TARGET=lab4
 
-OBJS  = lab4.o ece486_nco.o
+OBJS  = lab4.o
 
 INSTALLDIR = /usr/local/stmdev/
 
